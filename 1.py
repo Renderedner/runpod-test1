@@ -119,12 +119,21 @@ pipreqs ./
 # (find-fline "requirements.txt")
 
 # (find-fline "Dockerfile")
+(find-man "docker")
+(find-man "docker build")
+(find-man "docker run")
+ (eepitch-vterm)
+cd       ~/rptest/
+docker build . -t rpdtest1
+docker run -it    rpdtest1
+docker image ls
 
 
 # https://github.com/new
  (eepitch-vterm)
 git init
 git add *
-git commit "all-of-it"
+git commit -m "all-of-it"
 git remote add origin git@github.com:Renderedner/runpod-test1.git
+git push --set-upstream origin master
 """

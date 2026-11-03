@@ -1,2 +1,2 @@
 runpod==1.12.0
-transformers==5.21.0
+transformers==5.20.2
