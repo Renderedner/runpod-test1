@@ -135,6 +135,7 @@ docker image ls
 cd       ~/rptest/
 git init
 git add *
+git status
 git commit -m "all-of-it2"
 git status
 git remote add origin git@github.com:Renderedner/runpod-test1.git
