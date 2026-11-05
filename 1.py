@@ -18,36 +18,36 @@ HF_CACHE_ROOT = "/runpod-volume/huggingface-cache/hub"
 os.environ["HF_HUB_OFFLINE"] = "1"                   # Force offline mode to use only cached models
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 # (find-dailydiag "28-09-2026.org" "110"  ".runpod-doc-tutorial-model-caching" "def resolve_snapshot_path")
-# def resolve_snapshot_path(model_id: str) -> str:                                                                  # Qual a necessidade dessa função? 
-#     if "/" not in model_id:                                                                                       # O huggingface já não resolveria essa resolução sozinho? 
-#         raise ValueError(f"MODEL_ID '{model_id}' is not in 'org/name' format")
-#     org, name = model_id.split("/", 1)
-#     model_root = os.path.join(HF_CACHE_ROOT, f"models--{org}--{name}")
-#     refs_main = os.path.join(model_root, "refs", "main")
-#     snapshots_dir = os.path.join(model_root, "snapshots")
-#     print(f"[ModelStore] MODEL_ID: {model_id}")
-#     print(f"[ModelStore] Model root: {model_root}")
-#     if os.path.isfile(refs_main):
-#         with open(refs_main, "r") as f:
-#             snapshot_hash = f.read().strip()
-#         candidate = os.path.join(snapshots_dir, snapshot_hash)
-#         if os.path.isdir(candidate):
-#             print(f"[ModelStore] Using snapshot from refs/main: {candidate}")
-#             return candidate
-#     if not os.path.isdir(snapshots_dir):
-#         raise RuntimeError(f"[ModelStore] snapshots directory not found: {snapshots_dir}")
-#     versions = [
-#         d for d in os.listdir(snapshots_dir) if os.path.isdir(os.path.join(snapshots_dir, d))
-#     ]
-#     if not versions:
-#         raise RuntimeError(f"[ModelStore] No snapshot subdirectories found under {snapshots_dir}")
-#     versions.sort()
-#     chosen = os.path.join(snapshots_dir, versions[0])
-#     print(f"[ModelStore] Using first available snapshot: {chosen}")
-#     return chosen
-# LOCAL_MODEL_PATH = resolve_snapshot_path(MODEL_ID); print(f"[ModelStore] Resolved local model path: {LOCAL_MODEL_PATH}")           # (find-daily "15-10-2026.org" ".runpod-local-test-download-model")
-# tokenizer = AutoTokenizer.from_pretrained(LOCAL_MODEL_PATH, trust_remote_code=False, local_files_only=True, )
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=False, local_files_only=True, )
+def resolve_snapshot_path(model_id: str) -> str:                                                                  # Qual a necessidade dessa função? 
+    if "/" not in model_id:                                                                                       # O huggingface já não resolveria essa resolução sozinho? 
+        raise ValueError(f"MODEL_ID '{model_id}' is not in 'org/name' format")
+    org, name = model_id.split("/", 1)
+    model_root = os.path.join(HF_CACHE_ROOT, f"models--{org}--{name}")
+    refs_main = os.path.join(model_root, "refs", "main")
+    snapshots_dir = os.path.join(model_root, "snapshots")
+    print(f"[ModelStore] MODEL_ID: {model_id}")
+    print(f"[ModelStore] Model root: {model_root}")
+    if os.path.isfile(refs_main):
+        with open(refs_main, "r") as f:
+            snapshot_hash = f.read().strip()
+        candidate = os.path.join(snapshots_dir, snapshot_hash)
+        if os.path.isdir(candidate):
+            print(f"[ModelStore] Using snapshot from refs/main: {candidate}")
+            return candidate
+    if not os.path.isdir(snapshots_dir):
+        raise RuntimeError(f"[ModelStore] snapshots directory not found: {snapshots_dir}")
+    versions = [
+        d for d in os.listdir(snapshots_dir) if os.path.isdir(os.path.join(snapshots_dir, d))
+    ]
+    if not versions:
+        raise RuntimeError(f"[ModelStore] No snapshot subdirectories found under {snapshots_dir}")
+    versions.sort()
+    chosen = os.path.join(snapshots_dir, versions[0])
+    print(f"[ModelStore] Using first available snapshot: {chosen}")
+    return chosen
+LOCAL_MODEL_PATH = resolve_snapshot_path(MODEL_ID); print(f"[ModelStore] Resolved local model path: {LOCAL_MODEL_PATH}")           # (find-daily "15-10-2026.org" ".runpod-local-test-download-model")
+tokenizer = AutoTokenizer.from_pretrained(LOCAL_MODEL_PATH, trust_remote_code=False, local_files_only=True, )
+# tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=False, local_files_only=True, )
 model     = AutoModelForCausalLM.from_pretrained( MODEL_ID, trust_remote_code=False, torch_dtype="auto",
                                                   device_map="auto", local_files_only=True, attn_implementation="eager", )
 text_gen  = pipeline( "text-generation", model=model, tokenizer=tokenizer, )
@@ -118,6 +118,7 @@ pip install pipreqs
 pipreqs ./
 # (find-fline "requirements.txt")
 
+# (find-fline "")
 # (find-fline "Dockerfile")
 (find-man "docker")
 (find-man "docker build")
@@ -131,9 +132,11 @@ docker image ls
 
 # https://github.com/new
  (eepitch-vterm)
+cd       ~/rptest/
 git init
 git add *
-git commit -m "all-of-it"
+git commit -m "all-of-it2"
+git status
 git remote add origin git@github.com:Renderedner/runpod-test1.git
 git push --set-upstream origin master
 """
