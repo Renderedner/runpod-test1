@@ -15,6 +15,9 @@ ipython --no-autoindent
 import os; import runpod; from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 MODEL_ID = os.environ.get("MODEL_NAME", "microsoft/Phi-3-mini-4k-instruct")
 HF_CACHE_ROOT = "/runpod-volume/huggingface-cache/hub"
+
+# (find-dailydiag "29-10-2026.org" "112"  ".hfcdoc-local-cache" "HF_HUB_CACHE")
+os.environ["HF_HUB_CACHE"] = "/runpod-volume/huggingface-cache/hub/"      
 os.environ["HF_HUB_OFFLINE"] = "1"                   # Force offline mode to use only cached models
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 # (find-dailydiag "28-09-2026.org" "110"  ".runpod-doc-tutorial-model-caching" "def resolve_snapshot_path")
@@ -47,9 +50,21 @@ def resolve_snapshot_path(model_id: str) -> str:                                
     return chosen
 LOCAL_MODEL_PATH = resolve_snapshot_path(MODEL_ID); print(f"[ModelStore] Resolved local model path: {LOCAL_MODEL_PATH}")           # (find-daily "15-10-2026.org" ".runpod-local-test-download-model")
 tokenizer = AutoTokenizer.from_pretrained(LOCAL_MODEL_PATH, trust_remote_code=False, local_files_only=True, )
-# tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=False, local_files_only=True, )
-model     = AutoModelForCausalLM.from_pretrained( MODEL_ID, trust_remote_code=False, torch_dtype="auto",
+model     = AutoModelForCausalLM.from_pretrained( LOCAL_MODEL_PATH, trust_remote_code=False, torch_dtype="auto",
                                                   device_map="auto", local_files_only=True, attn_implementation="eager", )
+
+import subprocess
+      # subprocess.check_output(["ls", "-la", "/runpod-volume/huggingface-cache/hub/"])
+      # str(subprocess.check_output(["ls", "-la", "/runpod-volume/huggingface-cache/hub/"]))
+      # str(subprocess.check_output(["ls", "-la", "/runpod-volume/huggingface-cache/hub/"])).replace("\\n", "\n")
+print(str(subprocess.check_output(["ls", "-la", "/runpod-volume/huggingface-cache/hub/"])).replace("\\n", "\n"))
+print(str(subprocess.check_output(["ls", "-la", "/runpod-volume/huggingface-cache/hub/models--microsoft--Phi-3-mini-4k-instruct"])).replace("\\n", "\n"))
+print(str(subprocess.check_output(["ls", "-la", "/runpod-volume/huggingface-cache/hub/models--microsoft--Phi-3-mini-4k-instruct/snapshots"])).replace("\\n", "\n"))
+print(str(subprocess.check_output(["ls", "-la", "/runpod-volume/huggingface-cache/hub/models--microsoft--Phi-3-mini-4k-instruct/snapshots/f39ac1d28e925b323eae81227eaba4464caced4e"])).replace("\\n", "\n"))
+
+# tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=False, local_files_only=True, )
+# model     = AutoModelForCausalLM.from_pretrained( MODEL_ID, trust_remote_code=False, torch_dtype="auto",
+#                                                   device_map="auto", local_files_only=True, attn_implementation="eager", )
 text_gen  = pipeline( "text-generation", model=model, tokenizer=tokenizer, )
 print("[ModelStore] Model loaded from local snapshot")
 # text_gen("In this course, we will teach you how to", max_length=15, num_return_sequences=1,)
@@ -126,9 +141,18 @@ pipreqs ./
  (eepitch-vterm)
 cd       ~/rptest/
 docker build . -t rpdtest1
-docker run -it    rpdtest1
+export RPDCACHE=/runpod-volume/huggingface-cache/hub/
+export LOCCACHE=~/.cache/huggingface/hub/
+# (find-fline "~/.cache/huggingface/hub/")
+# (find-fline "~/.cache/huggingface/hub/models--microsoft--Phi-3-mini-4k-instruct/snapshots/f39ac1d28e925b323eae81227eaba4464caced4e")
+# docker run -it -v    rpdtest1
+docker run -it -v  $LOCCACHE:$RPDCACHE  rpdtest1
 docker image ls
 
+
+
+(find-sh  "docker volume create --help")
+(find-man "docker-volume-create")
 
 # https://github.com/new
  (eepitch-vterm)
